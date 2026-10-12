@@ -40,8 +40,10 @@ void solve() {
     cin >> n;
     vector<int> a(n);
     for (int &x : a) cin >> x;
+
+    int result;
  
-    cout << sum << '\n';
+    cout << result << '\n';
 }
  
 int main() {
