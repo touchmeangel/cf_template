@@ -34,7 +34,6 @@ ll power_mod(ll b, ll e, ll m) { // b^e mod m in O(log e)
     return r;
 }
 
-
 void solve() {
     int n;
     cin >> n;
