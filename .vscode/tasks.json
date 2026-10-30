@@ -1,4 +1,3 @@
-
 {
     "version": "2.0.0",
     "tasks": [
@@ -20,6 +19,17 @@
                 "isDefault": true
             },
             "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Run C++",
+            "type": "shell",
+            "command": "./${fileBasenameNoExtension}",
+            "dependsOn": "Build C++17",
+            "dependsOrder": "sequence",
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": []
         }
     ]
 }
