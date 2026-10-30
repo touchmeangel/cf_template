@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <type_traits>
 
 using namespace std;
 using ll = long long;
@@ -23,38 +24,56 @@ const ld EPS = 1e-9L;                 // "close enough to zero" for real numbers
 const ll INF = (ll)1e18;
 const ll MOD = 1'000'000'007;
 
-struct P { ld x, y; };
- 
-P operator+(P a, P b)  { return {a.x + b.x, a.y + b.y}; }
-P operator-(P a, P b)  { return {a.x - b.x, a.y - b.y}; }
-P operator*(P a, ld k) { return {a.x * k, a.y * k}; }
- 
+template <class T> struct Pt {
+    T x{}, y{};
+    Pt operator+(const Pt &o) const { return {x + o.x, y + o.y}; }
+    Pt operator-(const Pt &o) const { return {x - o.x, y - o.y}; }
+    Pt operator*(T k) const { return {x * k, y * k}; }
+};
+using P  = Pt<ld>;   // real point
+using Pl = Pt<ll>;   // integer point
+
+template <class T> T absv(T x) {
+    if constexpr (is_floating_point_v<T>) return fabs(x);
+    else return x < 0 ? -x : x;
+}
+
+template <class T> bool is_zero(T x) {
+    if constexpr (is_floating_point_v<T>) return absv(x) < EPS;
+    else return x == 0;
+}
+
 // DOT product = |a| * |b| * cos(theta)
 //   == 0  -> the vectors are perpendicular (a right angle!)
 //   >  0  -> angle between them is acute
 //   <  0  -> angle between them is obtuse
-ld dot(P a, P b) { return a.x * b.x + a.y * b.y; }
+template <class T> T dot(const Pt<T> &a, const Pt<T> &b) { return a.x * b.x + a.y * b.y; }
 
 // CROSS product (2D) = |a| * |b| * sin(theta), signed
 //   == 0  -> the vectors are parallel (points are collinear)
 //   >  0  -> b is counter-clockwise (left turn) from a,   < 0 -> clockwise
 //   |cross| = area of the parallelogram spanned by a and b (triangle area = |cross| / 2)
-ld cross(P a, P b) { return a.x * b.y - a.y * b.x; }
+template <class T> T cross(const Pt<T> &a, const Pt<T> &b) { return a.x * b.y - a.y * b.x; }
 
-ld len2(P a)      { return dot(a, a); }        // squared length: no sqrt, exact for integers
-ld len(P a)       { return sqrtl(len2(a)); }
-ld dist(P a, P b) { return len(a - b); }
+template <class T> T  len2(const Pt<T> &a) { return dot(a, a); }
+template <class T> ld len(const Pt<T> &a)  { return sqrtl((ld)len2(a)); }
+template <class T> ld dist(const Pt<T> &a, const Pt<T> &b) { return len(a - b); }
+template <class T> T  manhattan(const Pt<T> &a, const Pt<T> &b) { return absv(a.x - b.x) + absv(a.y - b.y); }
 
 // Angle between two vectors in [0, pi].
-// Because tan(theta) = sin/cos = cross/dot, atan2(|cross|, dot) gives the angle without
+// |a| * |b| * sin(theta) / (|a| * |b| * cos(theta)) ==
+// sin(theta) / cos(theta)
+// atan2(|cross|, dot) gives the angle without
 // dividing (so no problem when dot == 0, i.e. when tan would be "infinite").
-ld angleBetween(P a, P b) { return atan2l(fabsl(cross(a, b)), dot(a, b)); }
+template <class T> ld angleBetween(const Pt<T> &a, const Pt<T> &b) {
+    return atan2l((ld)absv(cross(a, b)), (ld)dot(a, b));
+}
 
 // Is the angle at vertex v (between rays v->a and v->b) a right angle?
-bool rightAt(P v, P a, P b) { return fabsl(dot(a - v, b - v)) < EPS; }
- 
+template <class T> bool rightAt(const Pt<T> &v, const Pt<T> &a, const Pt<T> &b) { return is_zero(dot(a - v, b - v)); }
+
 // Are the three points on one line?
-bool collinear(P a, P b, P c) { return fabsl(cross(b - a, c - a)) < EPS; }
+template <class T> bool collinear(const Pt<T> &a, const Pt<T> &b, const Pt<T> &c) { return is_zero(cross(b - a, c - a)); }
 
 ll my_gcd(ll a, ll b) { return b ? my_gcd(b, a % b) : a; } // Euclidean algorithm
 
