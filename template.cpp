@@ -81,12 +81,12 @@ template <class T> void print(const vector<T> &v) {   // print a vector on one l
     for (int i = 0; i < sz(v); i++) cout << v[i] << (i + 1 < sz(v) ? ' ' : '\n');
 }
 
-ll power_mod(ll a, ll e, ll m) {
+ll power_mod(ll a, ll e) {
     ll r = 1; // a^0
 
     while (e > 0) {
-        if (e & 1) r = r * a % m; // odd
-        a = a*a % m; // (b^2)^e/2
+        if (e & 1) r = r * a % MOD; // odd
+        a = a*a % MOD; // (b^2)^e/2
         e >>= 1; // e/=2
     }    
 
@@ -96,11 +96,11 @@ ll power_mod(ll a, ll e, ll m) {
 const int MAXN = 1'000'001;
 ll fact[MAXN], inv_fact[MAXN];
 
-void precompute(size_t n, ll m) {
+void precompute(size_t n) {
     fact[0] = 1;
     for (int i = 1; i <= n; i++) fact[i] = fact[i - 1] * i % MOD;
 
-    inv_fact[n] = power_mod(fact[n], MOD - 2, MOD); // x^(p-2) = x^(-1) mod p
+    inv_fact[n] = power_mod(fact[n], MOD - 2); // x^(p-2) = x^(-1) mod p
     for (int i = n; i >= 1; i--) inv_fact[i - 1] = inv_fact[i] * i % MOD; // 1/(i-1)! = i * (1/i!)
 }
  
